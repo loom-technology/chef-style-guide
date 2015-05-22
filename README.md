@@ -19,9 +19,9 @@ end
 **Preferred**
 
 ```ruby
-depends apt, '~> 2.7.0'
-depends git, '~> 4.2.2'
-depends jenkins '~> 2.3.1'
+depends apt
+depends git, '~> 4.2'
+depends jenkins '2.3.1'
 …
 ```
 
