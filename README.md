@@ -14,6 +14,13 @@ Specify versions with pessimistic versioning.
 %w(apt git jenkins …).each do |cookbook|
   depends cookbook
 end
+
+%w(apt
+   git
+   jenkins …).each do |cookbook|
+     depends cookbook
+end
+
 ```
 
 **Preferred**
@@ -30,6 +37,8 @@ If you use percent strings, you cannot specify version numbers.
 Using the preferred style, changes in git are easier to read.
 
 Percent string arrays can also grow very long, creating a long line of code. Lines should be short since GitHub cuts off lines at 80 characters.
+
+Multiline percent strings still have the problem that you cannot specify cookbook version numbers.
 
 
 The `%w(…)` [percent string syntax](http://www.ruby-doc.org/core-2.2.0/doc/syntax/literals_rdoc.html#label-Percent+Strings) may be difficult to understand if you or another developer are new to Ruby. Don't assume a high level of familiarity with Ruby.
