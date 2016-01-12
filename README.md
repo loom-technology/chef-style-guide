@@ -115,3 +115,43 @@ end
 ```
 
 Prefer using `#tap` if you have long lines. Long lines are cut off in GitHub. This will improve the readability of your attribute settings.
+
+# Improve your experience
+
+Here are some notes you can refer to. They will help make the best of your experience in designing and building things with Chef.
+
+## Ruby
+
+Understanding Ruby is incredibly helpful. Encourage your team to be opinionated and to agree on a style works for the team.
+
+Increasing readability will reduce software defects. Follow the community's Ruby Style guide.
+
+- https://github.com/bbatsov/ruby-style-guide
+
+## Testing
+
+Tests are an essential part of our prescribed workflow.
+
+Previously, we've recommended Chefspec and ServerSpec. Our new recommendation for testing methodology is to use our new framework called InSpec.
+
+- http://betterspecs.org/
+- https://github.com/sethvargo/chefspec
+- http://serverspec.org/
+- https://github.com/chef/inspec
+
+## Cookbook Design
+
+I emphasize good cookbook design. Chef is incredibly flexible, but enforcing design choices will decrease defects and result in better code that is easier to maintain.
+
+### Library-based cookbooks
+
+[You'll see the phrase "don't repeat yourself" fairly often, and you'll see the acronym DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
+
+Although many cookbooks are a set of linear interpereted Ruby instructions, there are also plenty of design patterns you can put to use. One I like a lot is the "library-based cookbook" pattern.
+
+C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author library-based cookbooks. Library-based cookbooks contain core, reusable functionality to configure something in a specific way. Then you can write a "wrapper cookbook" to consume the library-based cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects!
+
+A good example of a library-based cookbook is the mysql cookbook, authored largely by Sean Omeara (Github username "someara"). He and I strongly advocate for this pattern.
+
+- https://supermarket.chef.io/cookbooks/mysql
+- https://github.com/someara
