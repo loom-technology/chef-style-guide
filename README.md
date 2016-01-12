@@ -45,7 +45,7 @@ The `%w(…)` [percent string syntax](http://www.ruby-doc.org/core-2.2.0/doc/syn
 
 ## Cookbook names
 
-The cookbook name is the Github repository name, using Ruby underscore style.
+The cookbook name is the GitHub repository name, using Ruby underscore style.
 
 **Incorrect**
 
@@ -151,7 +151,7 @@ Although many cookbooks are a set of linear interpereted Ruby instructions, ther
 
 C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author library-based cookbooks. Library-based cookbooks contain core, reusable functionality to configure something in a specific way. Then you can write a "wrapper cookbook" to consume the library-based cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects!
 
-A good example of a library-based cookbook is the mysql cookbook, authored largely by Sean Omeara (Github username "someara"). He and I strongly advocate for this pattern.
+A good example of a library-based cookbook is the mysql cookbook, authored largely by Sean Omeara (GitHub username "someara"). He and I strongly advocate for this pattern.
 
 - https://supermarket.chef.io/cookbooks/mysql
 - https://github.com/someara
