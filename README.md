@@ -297,6 +297,10 @@ Take a look at my example cookbooks for reference.
 
 Created and maintained by [Kevin J. Dickerson][kevin]. <kevin.dickerson@loom.technology>
 
+# References
+
+References are listed at the bottom of this markdown document. Look at the bottom of the [RAW view of this document][raw] to see the references.
+
 # Changes
 
 This guide follows [Semantic Versioning 2.0][semver].
@@ -310,6 +314,7 @@ This guide follows [Semantic Versioning 2.0][semver].
 - Updates code examples
 - Refactors markdown links to use named links
 - Adds version shield
+- Adds references
 
 ## 0.1.0 (03/21/2016)
 
@@ -329,3 +334,4 @@ This guide follows [Semantic Versioning 2.0][semver].
 [example]: https://supermarket.chef.io/cookbooks/example
 [example_resources]: https://supermarket.chef.io/cookbooks/example_resources
 [precedence]: http://ruby-doc.org/core-2.2.0/doc/syntax/precedence_rdoc.html
+[raw]: https://raw.githubusercontent.com/kevindickerson/chef-style-guide/master/README.md
