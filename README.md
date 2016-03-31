@@ -260,11 +260,21 @@ Since unit tests run before the Chef execute phase, unit tests perform quickly, 
 
 Unit tests are written in [ChefSpec][chefspec].
 
+Take a look at my example cookbooks for reference on unit testing.
+
+- [https://supermarket.chef.io/cookbooks/example][example]
+- [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
+
 ### Integration testing with InSpec
 
 Integration tests run against a converged virtual machine. Use integration tests to verify that Chef recipes configure a virtual machine to a desired state.
 
 Integration tests are written in [InSpec][inspec].
+
+Take a look at my example cookbooks for reference on integration testing.
+
+- [https://supermarket.chef.io/cookbooks/example][example]
+- [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
 
 ### Betterspecs.org
 
@@ -288,7 +298,7 @@ C calls them libraries, Python calls them packages, and Ruby calls them gems. Wi
 
 After writing a resource cookbook, you can then write a "wrapper cookbook" which consumes the resource cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects.
 
-Take a look at my example cookbooks for reference.
+Take a look at my example cookbooks for reference on wrapping resource cookbooks and creating custom resources.
 
 - [https://supermarket.chef.io/cookbooks/example][example]
 - [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
