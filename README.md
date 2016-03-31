@@ -1,5 +1,7 @@
 # Chef Style Guide
 
+[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.2.0-blue.svg)](https://github.com/kevindickerson/chef-style-guide)
+
 Follow this style guide to write more readable code with fewer errors.
 
 ## 1. Metadata
@@ -100,7 +102,7 @@ node[some_fancy_key]
 
 ##### Incorrect
 
-The Mash class exists so you can call node attributes in the following bad ways. Don't use them.
+The Mash class exists so you can call node attributes in the following bad ways. Don't use Mash.
 
 ```ruby
 node["with"]["any"]["double"]["quotes"]
@@ -110,11 +112,11 @@ node[:with][:any][:symbols]
 
 ### 4.2 Use #tap to access nested attributes
 
-If you are getting or setting many node attributes at the same nested level, use Ruby's #tap method to simplify your code.
+If you are getting or setting many node attributes at the same nested level, use Ruby's [#tap][#tap] method to simplify your code.
 
 #### Discussion
 
-Prefer using `#tap` if you have long lines.
+Prefer using #tap if you have long lines.
 
 Using #tap will improve readability if you have long lines caused by lots of nested attributes. Since lots of nested attributes can make your code bloat out with lots of long lines, it will improve the legibility of such code to use #tap.
 
@@ -162,28 +164,115 @@ default['java'].tap do |java|
 end
 ```
 
+## 5. Templates
+
+### 5.1 Do not use Ruby logic in ERB templates
+
+Do not use Ruby logic in ERB templates. Instead, use the `variables` property when using Chef's `template` resource.
+
+#### Discussion
+
+When using the Chef `template` resource, do not put logic in your ERB (Embedded Ruby) template files.
+
+The Chef `template` resource has an optional `variables` property, which takes a hash. The keys of the hash are used to create variables that are made available in the scope of the ERB template.
+
+Perform all necessary logic in your recipes, custom resource actions, or helper methods to create a hash. Then pass the hash to the `variables` property on your `template` resource call.
+
+Separating logic from templates allows you to isolate concerns. For example, you may want to test a helper method to verify that it provides the correct logical value to a template.
+
+##### Incorrect
+
+In the following scenario, the code uses logic in an ERB template to determine the contents of a hypothetical configuration file.
+
+In the hypothetical configuration file,  `an_important_config_key` is set to a value determined by simple Ruby logic within the configuration file's ERB template.
+
+In an ERB template:
+
+```ruby
+<% if node['some_key'] == 'some value' -%>
+an_important_config_key "<%= node['some_other_key'] %>"
+<% else -%>
+an_important_config_key "<%= node['some_third_key'] %>"
+<% end -%>
+…
+```
+
+##### Correct
+
+In the following scenario, no logic is contained in the ERB template.
+
+In a Chef recipe or custom resource action:
+
+```ruby
+config_value = # do some logic and set a value, possibly with a helper method
+some_template_variables = { an_important_config_value: config_value }
+```
+
+Then, in the ERB file:
+```ruby
+an_important_config_key "<%= an_important_config_value %>"
+…
+```
+
 # Improve your experience
 
 Here are some notes you can refer to. They will help make the best of your experience in designing and building things with Chef.
 
 ## Ruby
 
-Understanding Ruby is incredibly helpful. Encourage your team to be opinionated and to agree on a style works for the team.
+Understanding Ruby is incredibly helpful. Encourage your team to be opinionated and to agree on style and convention.
 
-Increasing readability will reduce software defects. Follow the community's Ruby Style guide.
+Increasing readability will reduce software defects. Follow [The Ruby Style Guide][ruby-style].
 
-- https://github.com/bbatsov/ruby-style-guide
+### Ruby style caveats
+
+Understand that there are certain recommendations in The Ruby Style Guide that may affect the logical operation of your software.
+
+#### Logical order of precedence
+
+For example, `and` and `&&` have a different [order of precedence][precedence]. Purposefully following an order of precedence may be functionally significant and more important than following the style guide.
+
+```ruby
+puts 'hi' and 'goodbye'
+hi
+=> nil
+
+puts 'hi' && 'goodbye'
+goodbye
+=> nil
+
+'hi' && 'goodbye'
+=> "goodbye"
+
+'hi' and 'goodbye'
+=> "goodbye"
+```
 
 ## Testing
 
-Tests are an essential part of our prescribed workflow.
+Tests are an essential part of any team's workflow. Don't let the notion of testing intimidate you! I recommend starting with integration tests, and then adding unit tests.
 
-Previously, we've recommended Chefspec and ServerSpec. Our new recommendation for testing methodology is to use our new framework called InSpec.
+### Unit testing with ChefSpec
 
-- http://betterspecs.org/
-- https://github.com/sethvargo/chefspec
-- http://serverspec.org/
-- https://github.com/chef/inspec
+Unit tests verify Chef's compile phase. Unit tests verify that certain Chef resources were called with certain properties. Unit tests are used to ensure that the code you've written is going to do what you thought it was going to do.
+
+Since unit tests run before the Chef execute phase, unit tests perform quickly, allowing you to fail faster.
+
+Unit tests are written in [ChefSpec][chefspec].
+
+### Integration testing with InSpec
+
+Integration tests run against a converged virtual machine. Use integration tests to verify that Chef recipes configure a virtual machine to a desired state.
+
+Integration tests are written in [InSpec][inspec].
+
+### Betterspecs.org
+
+[Betterspecs.org][betterspecs] will help you learn core concepts about testing.
+
+#### Caveats
+
+Some concepts at Betterspecs.org don't translate exactly to InSpec—for example, Betterspecs.org recommends using "expect" syntax instead of "should" syntax. However, if you're writing tests in InSpec, you *should* use "should" syntax since that's what it was designed for.
 
 ## Cookbook Design
 
@@ -193,32 +282,50 @@ I emphasize good cookbook design. Chef is incredibly flexible, but enforcing des
 
 [You'll see the phrase "don't repeat yourself" fairly often, and you'll see the acronym DRY][dry].
 
-Many cookbooks are recipe-centric, and contain a set of recipes. These recipes are added to a run list, and execute linearly interpereted Ruby instructions, there are also plenty of design patterns you can put to use. One I like a lot is the "library-based cookbook" pattern.
+Many cookbooks are recipe-centric, and contain a set of recipes. These recipes are added to a run list, and execute linearly interpreted Ruby instructions, there are also plenty of design patterns you can put to use. One I like a lot is what I'm calling the "resource cookbook" pattern.
 
-C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author library-based cookbooks. Library-based cookbooks contain core, reusable functionality to configure something in a specific way. Then you can write a "wrapper cookbook" to consume the library-based cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects!
+C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author **resource cookbooks**. Resource cookbooks define core, reusable functionality in the form of Chef resources to configure a machine in a specific way.
 
-Good examples of real life library-based cookbooks are the mysql cookbook and the httpd cookbook.
+After writing a resource cookbook, you can then write a "wrapper cookbook" which consumes the resource cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects.
 
-- https://supermarket.chef.io/cookbooks/mysql
-- https://supermarket.chef.io/cookbooks/httpd
+Take a look at my example cookbooks for reference.
+
+- [https://supermarket.chef.io/cookbooks/example][example]
+- [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
 
 # Author
 
 Created and maintained by [Kevin J. Dickerson][kevin]. <kevin.dickerson@loom.technology>
 
-# Semver
+# Changes
 
 This guide follows [Semantic Versioning 2.0][semver].
 
-# Changes
+## 0.2.0 (03/30/2016)
+
+- Expands and enumerates every section
+- Adds section on testing
+- Adds section on templates
+- Adds various subheadings to improve organization
+- Updates code examples
+- Refactors markdown links to use named links
+- Adds version shield
 
 ## 0.1.0 (03/21/2016)
 
-- Begin versioning this thing
+- Begins versioning
 
 [mash]: http://www.rubydoc.info/gems/chef/Mash
 [mashdef]: https://github.com/chef/chef/blob/master/lib/chef/mash.rb
 [snake_case]: https://en.wikipedia.org/wiki/Snake_case
 [dry]: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
-[kevin]: http://kevinjdickerson.com
+[kevin]: http://kevinjdickerson.com/
 [semver]: http://semver.org/
+[#tap]: http://ruby-doc.org/core-2.3.0/Object.html#method-i-tap
+[ruby-style]: https://github.com/bbatsov/ruby-style-guide
+[chefspec]: https://github.com/sethvargo/chefspec
+[inspec]: https://github.com/chef/inspec
+[betterspecs]: http://betterspecs.org/
+[example]: https://supermarket.chef.io/cookbooks/example
+[example_resources]: https://supermarket.chef.io/cookbooks/example_resources
+[precedence]: http://ruby-doc.org/core-2.2.0/doc/syntax/precedence_rdoc.html
