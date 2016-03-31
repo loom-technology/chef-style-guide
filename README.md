@@ -188,7 +188,7 @@ In the hypothetical configuration file,  `an_important_config_key` is set to a v
 
 In an ERB template:
 
-```ruby
+```erb
 <% if node['some_key'] == 'some value' -%>
 an_important_config_key "<%= node['some_other_key'] %>"
 <% else -%>
@@ -209,7 +209,7 @@ some_template_variables = { an_important_config_value: config_value }
 ```
 
 Then, in the ERB file:
-```ruby
+```erb
 an_important_config_key "<%= an_important_config_value %>"
 …
 ```
@@ -314,6 +314,10 @@ References are listed at the bottom of this markdown document. Look at the botto
 # Changes
 
 This guide follows [Semantic Versioning 2.0][semver].
+
+## In progress
+
+- Updates language syntax highlighting tags in markdown
 
 ## 0.2.0 (03/30/2016)
 
