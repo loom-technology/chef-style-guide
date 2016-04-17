@@ -1,6 +1,6 @@
 # Chef Style Guide
 
-[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.2.0-blue.svg)](https://github.com/kevindickerson/chef-style-guide)
+[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.2.1-blue.svg)](https://github.com/loom-technology/chef-style-guide)
 
 Follow this style guide to write more readable code with fewer errors.
 
@@ -314,6 +314,10 @@ References are listed at the bottom of this markdown document. Look at the botto
 # Changes
 
 This guide follows [Semantic Versioning 2.0][semver].
+
+## 0.2.1 (04/16/2016)
+
+- Updates URL for GitHub
 
 ## 0.2.0 (03/30/2016)
 
