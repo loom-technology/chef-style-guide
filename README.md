@@ -436,6 +436,10 @@ This guide follows [Semantic Versioning 2.0].
 
 - Updates URL for GitHub
 
+## In progress
+
+- Updates language syntax highlighting tags in markdown
+
 ## 0.2.0 (03/30/2016)
 
 - Expands and enumerates every section
