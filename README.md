@@ -1,6 +1,6 @@
 # Chef Style Guide
 
-[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.2.1-blue.svg)](https://github.com/loom-technology/chef-style-guide)
+[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.3.0-blue.svg)](https://github.com/loom-technology/chef-style-guide)
 
 Follow this style guide to write more readable code with fewer errors.
 
@@ -12,19 +12,23 @@ Use a single line for each cookbook dependency, especially if you have many depe
 
 ### 1.2 Use exact or pessimistic versioning
 
-Specify versions with [pessimistic versioning constraints](http://guides.rubygems.org/patterns/#pessimistic-version-constraint) or exact version constraints.
+Specify versions with [pessimistic versioning constraints] or exact version constraints.
 
-#### Discussion
+[pessimistic versioning constraints]: http://guides.rubygems.org/patterns/#pessimistic-version-constraint
 
-If you use percent strings, you cannot specify cookbook version numbers. Since you should be specifying version numbers, you're already off to a bd start.
+### 1.3 Discussion
 
-Using the preferred style, changes in git are easier to read.
+Don't use percent strings or iterators to declare dependencies, since you can't specify cookbook version constraints.
 
-Percent string arrays can also grow very long, creating a long line of code. Lines should be short since GitHub cuts off lines at 80 characters.
+Using the preferred style, changes in GitHub are easier to read. Instead of having one or more dependency changes per line, GitHub will only show one change per line.
 
-Multiline percent strings still have the problem that you cannot specify cookbook version numbers.
+Percent string arrays can grow very long, creating long lines of code. Lines should be short since GitHub cuts off lines that are longer than 120 characters, decreasing readability.
 
-The `%w(…)` [percent string syntax](http://www.ruby-doc.org/core-2.2.0/doc/syntax/literals_rdoc.html#label-Percent+Strings) may be difficult to understand if you or another developer are new to Ruby. Don't assume a high level of familiarity with Ruby.
+Multiline percent strings also don't allow authors to specify cookbook version constraints.
+
+The `%w(…)` [percent string syntax] may be difficult to understand if you or another developer are new to Ruby. Don't assume a high level of familiarity with Ruby.
+
+[percent string syntax]: http://www.ruby-doc.org/core-2.2.0/doc/syntax/literals_rdoc.html#label-Percent+Strings
 
 ##### Incorrect
 
@@ -43,21 +47,28 @@ end
 ##### Correct
 
 ```ruby
-depends apt
-depends git, '~> 4.2'
-depends jenkins '2.3.1'
+depends apt '4.0.2'
+depends git, '~> 5.0'
+depends jenkins '2.6.0'
 …
 ```
 
-## 3. Cookbook names
+## 2. Cookbook names
 
-### 3.1 Use underscores and lowercase letters to name cookbooks
+### 2.1 Use underscores and lowercase letters to name cookbooks
 
 #### Discussion
 
-The cookbook name is the GitHub repository name. Use lowercase names with underscores separating words. This is often called "[snake case][snake_case]."
+The cookbook name is the GitHub repository name. Use lowercase names with underscores separating words. This is called "[snake case]."
 
-Since Chef is written in Ruby, do not use symbols that are invalid for Ruby methods. Hyphens are invalid symbols for Ruby method names, so don't use hyphens in cookbook names.
+Since Chef is written in Ruby, do not use characters that are invalid for Ruby methods. In some versions of Ruby, hyphens are invalid characters for symbol names—e.g. `:this-is-invalid` but `:"this-is-valid"` in Ruby >= 2.0.0. Do not use hyphens in cookbook names.
+
+Keeping cookbooks in their own GitHub organization helps to separate concerns. This is analogous to achieving [first normal form] in a relational database. For example, this document is in the GitHub organization `loom-technology`, but Loom cookbooks are stored in the GitHub organization `loom-cookbooks`.
+
+It may also be desirable to prefix cookbooks names with your an abbreviation of your organization—e.g. `myorg_logstash`. This is not an uncommon pattern and can help clarify which repository is which if you have a cluttered namespace— lots of things that have similar names.
+
+[snake case]: https://en.wikipedia.org/wiki/Snake_case
+[first normal form]: https://en.wikipedia.org/wiki/First_normal_form
 
 ##### Incorrect
 
@@ -72,19 +83,24 @@ long-cookbook-name
 ```ruby
 logstash
 long_cookbook_name
+myorg_logstash
 ```
 
-## 4. Attributes
+## 3. Attributes
 
-### 4.1 Use strings to access node attribute keys
+### 3.1 Use strings to access node attribute keys
 
 Use the style, `node['with']['single']['quotes']`.
 
 #### Discussion
 
-For more background see this post, [Remove contentious rule FC001](https://github.com/acrmp/foodcritic/issues/86).
+For more background see this post, [Remove contentious rule FC001].
 
-Each node attribute is a [Mash][mash] (defined in [lib/chef/mash.rb][mashdef]).  It's inefficient and can lead to problems. A valid node attribute is not necessarily a valid Ruby symbol or a valid Ruby method—so just skip the magic and stick to strings.
+Each node attribute is a [Mash] (defined in [lib/chef/mash.rb]). Using Mash can lead to problems. A valid node attribute is not necessarily a valid Ruby symbol or a valid Ruby method—so just skip the Mash magic and stick to strings.
+
+[Remove contentious rule FC001]: https://github.com/acrmp/foodcritic/issues/86
+[Mash]: http://www.rubydoc.info/gems/chef/Mash
+[lib/chef/mash.rb]: https://github.com/chef/chef/blob/master/lib/chef/mash.rb
 
 ##### Correct
 
@@ -92,7 +108,8 @@ Each node attribute is a [Mash][mash] (defined in [lib/chef/mash.rb][mashdef]). 
 node['with']['single']['quotes']
 ```
 
-You may be forced to use variables as key names:
+It's acceptable to use interpolation or variables in node attribute keys if it's absolutely required.
+
 ```ruby
 node["maybe_with_#{interpolation}_but_only_if_necessary"]
 
@@ -102,23 +119,26 @@ node[some_fancy_key]
 
 ##### Incorrect
 
-The Mash class exists so you can call node attributes in the following bad ways. Don't use Mash.
+The Mash class allows you to call node attributes in the following bad ways.
 
 ```ruby
 node["with"]["any"]["double"]["quotes"]
 node.with.any.accessor.calls
-node[:with][:any][:symbols]
+node[:with][:normal][:symbols]
+node[:"with"][:"string"][:"literal"][:"symbols"]
 ```
 
-### 4.2 Use #tap to access nested attributes
+### 3.2 Use #tap to access nested attributes
 
-If you are getting or setting many node attributes at the same nested level, use Ruby's [#tap][#tap] method to simplify your code.
+If you are getting or setting many node attributes at the same nested level, use Ruby's [#tap] method to simplify your code.
+
+[#tap]: http://ruby-doc.org/core-2.3.0/Object.html#method-i-tap
 
 #### Discussion
 
 Prefer using #tap if you have long lines.
 
-Using #tap will improve readability if you have long lines caused by lots of nested attributes. Since lots of nested attributes can make your code bloat out with lots of long lines, it will improve the legibility of such code to use #tap.
+Using #tap will improve readability if you have long lines caused by lots of nested attributes. Since lots of nested attributes can make your code bloat out with lots of long lines, it will improve the readability of such code to use #tap.
 
 Long lines are cut off in GitHub. This will improve the readability of your attribute settings.
 
@@ -164,9 +184,9 @@ default['java'].tap do |java|
 end
 ```
 
-## 5. Templates
+## 4. Templates
 
-### 5.1 Do not use Ruby logic in ERB templates
+### 4.1 Do not use Ruby logic in ERB templates
 
 Do not use Ruby logic in ERB templates. Instead, use the `variables` property when using Chef's `template` resource.
 
@@ -184,11 +204,11 @@ Separating logic from templates allows you to isolate concerns. For example, you
 
 In the following scenario, the code uses logic in an ERB template to determine the contents of a hypothetical configuration file.
 
-In the hypothetical configuration file,  `an_important_config_key` is set to a value determined by simple Ruby logic within the configuration file's ERB template.
+In the hypothetical configuration file, `an_important_config_key` is set to a value determined by simple Ruby logic within the configuration file's ERB template.
 
 In an ERB template:
 
-```ruby
+```erb
 <% if node['some_key'] == 'some value' -%>
 an_important_config_key "<%= node['some_other_key'] %>"
 <% else -%>
@@ -209,20 +229,52 @@ some_template_variables = { an_important_config_value: config_value }
 ```
 
 Then, in the ERB file:
-```ruby
+```erb
 an_important_config_key "<%= an_important_config_value %>"
 …
 ```
 
-# Improve your experience
+Pass the variables in your call on `template` resource:
+```ruby
+template '/etc/motd' do
+  variables(some_template_variables)
+end
+```
+
+# 5. Improve your experience
 
 Here are some notes you can refer to. They will help make the best of your experience in designing and building things with Chef.
 
 ## Ruby
 
-Understanding Ruby is incredibly helpful. Encourage your team to be opinionated and to agree on style and convention.
+Understanding Ruby is helpful. Encourage your team to be opinionated and to agree on style and convention.
 
-Increasing readability will reduce software defects. Follow [The Ruby Style Guide][ruby-style].
+Increasing readability will reduce software defects. Follow [The Ruby Style Guide].
+
+[The Ruby Style Guide]: https://github.com/bbatsov/ruby-style-guide
+
+### Less well-known Ruby features you should use
+
+Ruby [keyword arguments] are a step forward in the endless march against unnecessary punctuation. Use keyword arguments to make method definitions and method calls easier to understand.
+
+```ruby
+def gather_arguments(first: nil, **rest)
+  p first, rest
+end
+```
+
+Note: The following call does not need parentheses!
+
+```ruby
+gather_arguments first: 1, second: 2, third: 3
+# prints 1 then {:second=>2, :third=>3}
+```
+
+This now has the improved clarity of explicitly naming the parameters—the reader knows which value is assigned to which variable being sent to the method.
+
+Additionally, it is less visually cluttered since parenthesis are not required.
+
+[keyword arguments]: http://ruby-doc.org/core-2.1.8/doc/syntax/methods_rdoc.html#label-Keyword+Arguments
 
 ### Ruby style caveats
 
@@ -230,7 +282,7 @@ Understand that there are certain recommendations in The Ruby Style Guide that m
 
 #### Logical order of precedence
 
-For example, `and` and `&&` have a different [order of precedence][precedence]. Purposefully following an order of precedence may be functionally significant and more important than following the style guide.
+For example, `and` and `&&` have a different [order of precedence]. Purposefully following an order of precedence may be functionally significant and more important than following the style guide.
 
 ```ruby
 puts 'hi' and 'goodbye'
@@ -248,9 +300,49 @@ goodbye
 => "goodbye"
 ```
 
+[order of precedence]: http://ruby-doc.org/core-2.2.0/doc/syntax/precedence_rdoc.html
+
+#### Symbols
+
+Here are a few notes about [symbols in Ruby]. Most of this section is straight from the Ruby documentation.
+
+Understanding Ruby symbols—how they work, how to declare them, and so on—will simplify the inevitable discussions you will have about them.
+
+[symbols in Ruby]: https://ruby-doc.org/core-2.3.0/doc/syntax/literals_rdoc.html#label-Symbols
+
+##### String literal symbols
+
+You _can_ use _string literal symbols_ and _symbols by interpolation_. (Ruby >= 2.0.0.)
+
+```ruby
+:"my_symbol1"
+:"my_symbol#{1 + 1}"
+```
+
+However, this style decreases readability. Knowing that you _can_ do this will put to rest the discussion that symbols are immutable strings, or that their declaration style is exclusive to Ruby's `String`.
+
+-
+
+##### Symbols and speed
+
+Ruby 2.3 introduced immutable strings, which you can enable by setting an option. Ruby 3.0 will by default enable immutable strings.
+
+With immutable strings, you can specify the value of a string `'a'` and another string `'a'` and they will reference the same `'a'`. This saves memory and makes the code significantly more performant. You can read a [discussion on immutable string literals].
+
+So, are symbols faster than strings? Not really!
+
+[immutable string literals]: https://bugs.ruby-lang.org/issues/11473
+
 ## Testing
 
-Tests are an essential part of any team's workflow. Don't let the notion of testing intimidate you! I recommend starting with integration tests, and then adding unit tests.
+Tests are an essential part of any team's workflow. Don't let the notion of testing intimidate you! Try starting with integration tests, and then add unit tests later after you've "tuned" your code.
+
+Then, when you perform tests, run your unit tests first. Unit tests are faster, which allows you to fail faster, which is good!
+
+Chef runs in two phases: Compile, and execute.
+
+- Unit tests with ChefSpec verify code at compile time.
+- Integration tests with InSpec verify machine configuration at execute time.
 
 ### Unit testing with ChefSpec
 
@@ -258,35 +350,41 @@ Unit tests verify Chef's compile phase. Unit tests verify that certain Chef reso
 
 Since unit tests run before the Chef execute phase, unit tests perform quickly, allowing you to fail faster.
 
-Unit tests are written in [ChefSpec][chefspec].
+Unit tests are written in [ChefSpec].
 
 Take a look at my example cookbooks for reference on unit testing.
 
 - [https://supermarket.chef.io/cookbooks/example][example]
 - [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
 
+[ChefSpec]: https://github.com/sethvargo/chefspec
+
 ### Integration testing with InSpec
 
 Integration tests run against a converged virtual machine. Use integration tests to verify that Chef recipes configure a virtual machine to a desired state.
 
-Integration tests are written in [InSpec][inspec].
+Integration tests are written in [InSpec].
 
 Take a look at my example cookbooks for reference on integration testing.
 
 - [https://supermarket.chef.io/cookbooks/example][example]
 - [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
 
+[InSpec]: https://github.com/chef/inspec
+
 ### Betterspecs.org
 
-[Betterspecs.org][betterspecs] will help you learn core concepts about testing.
+[Betterspecs.org] will help you learn core concepts about testing.
+
+[Beterspecs.org]: http://betterspecs.org/
 
 #### Caveats
 
-Some concepts at Betterspecs.org don't translate exactly to InSpec—for example, Betterspecs.org recommends using "expect" syntax instead of "should" syntax. However, if you're writing tests in InSpec, you *should* use "should" syntax since that's what it was designed for.
+Some concepts at Betterspecs.org don't translate exactly to InSpec—for example, Betterspecs.org recommends using "expect" syntax instead of "should" syntax. However, if you're writing tests in InSpec, you *should* use "should" syntax since that's how it was designed to be used.
 
-## Cookbook Design
+## Cookbook design
 
-I emphasize good cookbook design. Chef is incredibly flexible, but enforcing design choices will decrease defects and result in better code that is easier to maintain.
+I emphasize good cookbook design. Chef is incredibly flexible, but enforcing design choices will increase readability, decrease defects and result in better code that is easier to maintain.
 
 ### Resource cookbooks
 
@@ -303,17 +401,36 @@ Take a look at my example cookbooks for reference on wrapping resource cookbooks
 - [https://supermarket.chef.io/cookbooks/example][example]
 - [https://supermarket.chef.io/cookbooks/example_resources][example_resources]
 
+[dry]: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
+
 # Author
 
 Created and maintained by [Kevin J. Dickerson][kevin]. <kevin.dickerson@loom.technology>
 
+# Acknowledgement
+
+Many of the thoughts here are a result of discussions with my friend and colleague Aaron Lane ([@aaron-lane], [@ncs-alane]) :maple_leaf:.
+
+[@aaron-lane]: https://github.com/aaron-lane
+[@ncs-alane]: https://github.com/ncs-alane
+
 # References
 
-References are listed at the bottom of this markdown document. Look at the bottom of the [RAW view of this document][raw] to see the references.
+Look at the [RAW view of this document][raw] to see the references and links in this document.
 
 # Changes
 
-This guide follows [Semantic Versioning 2.0][semver].
+This guide follows [Semantic Versioning 2.0].
+
+[Semantic Versioning 2.0]: http://semver.org/
+
+## 0.3.0 (09/25-2016)
+
+- Adds section on Ruby symbols
+- Adds additional clarification on several topics
+- Updates formatting
+- Updates several typos
+- Refactors named Markdown links
 
 ## 0.2.1 (04/16/2016)
 
@@ -334,18 +451,7 @@ This guide follows [Semantic Versioning 2.0][semver].
 
 - Begins versioning
 
-[mash]: http://www.rubydoc.info/gems/chef/Mash
-[mashdef]: https://github.com/chef/chef/blob/master/lib/chef/mash.rb
-[snake_case]: https://en.wikipedia.org/wiki/Snake_case
-[dry]: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
-[kevin]: http://kevinjdickerson.com/
-[semver]: http://semver.org/
-[#tap]: http://ruby-doc.org/core-2.3.0/Object.html#method-i-tap
-[ruby-style]: https://github.com/bbatsov/ruby-style-guide
-[chefspec]: https://github.com/sethvargo/chefspec
-[inspec]: https://github.com/chef/inspec
-[betterspecs]: http://betterspecs.org/
+[kevin]: https://loom.technology
 [example]: https://supermarket.chef.io/cookbooks/example
 [example_resources]: https://supermarket.chef.io/cookbooks/example_resources
-[precedence]: http://ruby-doc.org/core-2.2.0/doc/syntax/precedence_rdoc.html
 [raw]: https://raw.githubusercontent.com/kevindickerson/chef-style-guide/master/README.md
