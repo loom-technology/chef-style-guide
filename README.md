@@ -1,6 +1,6 @@
 # Chef Style Guide
 
-[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.3.1-blue.svg)](https://github.com/loom-technology/chef-style-guide)
+[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.3.2-blue.svg)](https://github.com/loom-technology/chef-style-guide)
 
 Follow this style guide to write more readable code with fewer errors.
 
@@ -390,9 +390,15 @@ I emphasize good cookbook design. Chef is incredibly flexible, but enforcing des
 
 [You'll see the phrase "don't repeat yourself" fairly often, and you'll see the acronym DRY][dry].
 
-Many cookbooks are recipe-centric, and contain a set of recipes. These recipes are added to a run list, and execute linearly interpreted Ruby instructions, there are also plenty of design patterns you can put to use. One I like a lot is what I'm calling the "resource cookbook" pattern.
+Many cookbooks are recipe-centric. They contain one or more recipes. These recipes are added to a run list, and execute interpreted Ruby instructions from top to bottom. There are multiple "patterns" you might encounter in the wild. Environment cookbooks. Role cookbooks. This one is what I'm calling the "resource cookbook" pattern.
 
-C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author **resource cookbooks**. Resource cookbooks define core, reusable functionality in the form of Chef resources to configure a machine in a specific way.
+C calls them libraries, Python calls them packages, and Ruby calls them gems. With Chef, a similar notion is to author **resource cookbooks**. Resource cookbooks define core, reusable functionality in the form of Chef resources to configure a machine in a specific way. I'm giving this pattern the name **resource cookbook* instead of **library cookbook* because Chef's basic unit of functionality is the **Chef Resource**.
+
+Once you start thinking of everything in terms of Chef Resources, it becomes easier to understand the _resource-centric_ world of Chef code:
+
+- Functional Chef Resources—blocks of code that configure a machine.
+- ChefSpec tests—unit tests to verify that a Chef Resource is being called the way the author intended.
+- InSpec tests—integration tests to verify that a Chef Resource actually behaved the way the author intended.
 
 After writing a resource cookbook, you can then write a "wrapper cookbook" which consumes the resource cookbook. This allows for separation of logical concerns, and isolated testing—this results in safer code with fewer defects.
 
@@ -424,7 +430,10 @@ This guide follows [Semantic Versioning 2.0].
 
 [Semantic Versioning 2.0]: http://semver.org/
 
-## 0.3.1 - 2016-09-25
+## 0.3.2 - 2016-09-26
+- Clarifies the resource cookbook section
+
+## 0.3.1 - 2016-09-26
 - Fixes a typo in a link
 - Changes date format in changes
 
