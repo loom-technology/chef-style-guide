@@ -1,6 +1,6 @@
 # Chef Style Guide
 
-[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.3.0-blue.svg)](https://github.com/loom-technology/chef-style-guide)
+[![Chef Style Guide](https://img.shields.io/badge/Chef%20Style%20Guide-v0.3.1-blue.svg)](https://github.com/loom-technology/chef-style-guide)
 
 Follow this style guide to write more readable code with fewer errors.
 
@@ -376,7 +376,7 @@ Take a look at my example cookbooks for reference on integration testing.
 
 [Betterspecs.org] will help you learn core concepts about testing.
 
-[Beterspecs.org]: http://betterspecs.org/
+[Betterspecs.org]: http://betterspecs.org/
 
 #### Caveats
 
@@ -424,20 +424,21 @@ This guide follows [Semantic Versioning 2.0].
 
 [Semantic Versioning 2.0]: http://semver.org/
 
-## 0.3.0 (09/25-2016)
+## 0.3.1 - 2016-09-25
+- Fixes a typo in a link
+- Changes date format in changes
 
+## 0.3.0 - 2016-09-25
 - Adds section on Ruby symbols
 - Adds additional clarification on several topics
 - Updates formatting
 - Updates several typos
 - Refactors named Markdown links
 
-## 0.2.1 (04/16/2016)
-
+## 0.2.1 - 2016-04-16
 - Updates URL for GitHub
 
-## 0.2.0 (03/30/2016)
-
+## 0.2.0 - 2016-03-30
 - Expands and enumerates every section
 - Adds section on testing
 - Adds section on templates
@@ -447,8 +448,7 @@ This guide follows [Semantic Versioning 2.0].
 - Adds version shield
 - Adds references
 
-## 0.1.0 (03/21/2016)
-
+## 0.1.0 - 2016-03-21
 - Begins versioning
 
 [kevin]: https://loom.technology
